@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="Generator" content="EditPlus®">
+  <meta name="Author" content="">
+  <meta name="Keywords" content="">
+  <meta name="Description" content="">
+  <title>Document</title>
+  <style type="text/css">
+	*{margin:0;padding:0;}
+	body,html{font-size:14px;font-family:"Microsoft YaHei"}
+	li{list-style:none;float:left;}
+	/*bannerList B*/
+	#banner{width:400px;height:200px;position:relative;margin:100px auto;overflow:hidden;border:1px solid pink}
+	#banner .banner_imgs{width:1000%;height:100%;position:absolute}
+	#banner .banner_imgs ul{height:100%;}
+	#banner .banner_imgs ul li{width:400px;height:100%;line-height:200px;text-align:center;font-size:100px;font-weight:100}
+	#banner .banner_bar{position:absolute;bottom:0;left:180px}
+	#banner .sidebar{position:absolute;right:0;top:100px;cursor:pointer;border:1px solid red;width:2em;height:1.5em;text-align:center;line-height:1.5em;-moz-user-select:none;/*火狐*/-webkit-user-select:none;/*webkit浏览器*/-ms-user-select:none;/*IE10*/-khtml-user-select:none;/*早期浏览器*/user-select:none;}
+	#banner .prev{left:0}
+	.on{color:#e5e5e5}
+	/*bannerList E*/
+  </style>
+ </head>
+ <body>
+		<!--bannerList B-->
+		<div class="warpper">
+			<div id="banner">
+				<div class="banner_imgs">					
+					<ul>
+						<li class="selected" >1</li>
+						<li >2</li>
+						<li >3</li>
+						<li >4</li>
+					</ul>
+				</div>
+				<div class="banner_bar">
+					<ul>
+						<li class="on">1</li>
+						<li>2</li>
+						<li>3</li>
+						<li>4</li>
+					</ul>
+				</div>
+				<span class="sidebar prev"><</span>
+				<span class="sidebar next">></span>
+			</div>
+		</div>
+		<!--bannerList E-->
+     <script src="js\jquery.js"></script>
+	 <script type="text/javascript">
+		$(function(){
+			/*找到图片上级div*/
+			var $img = $("#banner .banner_imgs");
+			/*找到bar*/
+			var $barUl = $("#banner .banner_bar ul");
+			/*找到图片*/
+			var $imgLis = $img.find("ul li");
+			/*找到图片个数*/
+			var len = $imgLis.length;
+			/*找到图片高宽*/
+			var h = $imgLis.height();
+			var w = $imgLis.width();
+			var $prev = $("#banner .prev");
+			var $next = $("#banner .next");
+			/*索引*/
+			var index = 0;
+			var timer =null;
+			/*点击bar*/
+			$barUl.on("click","li",function(){
+				index = $(this).index();
+				if(!$img.is(":animated")){
+					changeImg();
+				}
+			});
+			/*下一张*/
+			$next.on("click",function(){
+				if(!$img.is(":animated")){
+					index++;
+					changeImg();
+				}
+			});
+			/*上一张*/
+			$prev.on("click",function(){
+				if(!$img.is(":animated")){
+					index--;
+					changeImg();
+				}
+			});
+			function changeImg(){
+				if (index > len-1)
+				{
+					index = 0;
+				}else if(index < 0){
+					index = len - 1;
+				}
+				$img.animate({"left":(-index*w)+"px"},200);
+				$barUl.find("li").eq(index).addClass("on").siblings().removeClass("on");
+			};
+			//autoplay
+			auto();
+			function auto(){
+				timer = setInterval(function(){
+					index++;
+					changeImg();
+				},3000);
+			}
+			/*鼠标在上 停止轮播*/
+			$("#banner").hover(function(){
+					clearInterval(timer);
+			},function(){
+					auto();
+			});
+		});
+	 </script>
+ </body>
+</html>
