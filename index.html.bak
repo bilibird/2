@@ -50,7 +50,6 @@
 		<!--bannerList E-->
 		<div><a href="/NoTitle/">click me1</a></div>
 		<div><a href="/layerDialog/">click me2</a></div>
-		<div><a href="/layerDialog/index1.html">click me3</a></div>
      <script src="js\jquery.js"></script>
 	 <script type="text/javascript">
 		$(function(){
