@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>商品放大镜效果</title>
+		<link rel="icon" href="img/favicon.ico" mce_href="img/favicon.ico" type="image/x-icon">
+		<style type="text/css">
+			body{background:gray;}
+			img{display: block;}
+			#warp{width: 400px;height:500px;margin: 50px 0 0 50px;}
+			#warp .pic{width: 400px;height: 400px;position: relative;}
+			#warp .pic .pic-cover{position:absolute}
+			#warp .pic .pic-cover .cover{background:url(img/cover.png);/*width: 200px;height: 200px;*/position: absolute;top:0;left:0;display:none;cursor: move;}
+			#warp .pic .pic-cover .show{position: absolute;right: -408px;width: 400px;height:400px;top:0;display:none;background-image:url(img/1.jpg)}
+			
+			#warp .tab {width:400px;height:54px;margin-top: 25px;}
+			#warp .tab ul li{position:relative;float: left;width:50px;height:50px;list-style: none;border:2px solid gray;margin: 0 13px;transition:border .5s;}
+			#warp .tab ul li.on{border: 2px solid #f60;}
+			#warp .tab ul li img{display: none;position: absolute;}
+		</style>
+		<link rel="stylesheet" type="text/css" href="css/reset.css"/>
+	</head>
+	<body>
+		<!--wrap B-->
+		<div id="warp">
+			<div class="pic">
+				<div class="pic-cover">
+					<img src="img/1.jpg" width="400" height="400"/>
+					<div class="cover"></div>
+					<div class="show"></div>
+				</div>
+			</div>
+			<div class="tab">
+				<ul>
+					<li class="on"><img src="img/1.jpg" /></li>
+					<li><img src="img/2.jpg" /></li>
+					<li><img src="img/3.jpg" /></li>
+					<li><img src="img/4.jpg" /></li>
+					<li><img src="img/5.jpg" /></li>
+				</ul>
+			</div>
+		</div>
+		<!--wrap E-->
+		<script src="js/jquery-1.11.0.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			$(function(){
+				var $tabLi = $("#warp .tab ul li");
+				//小图
+				var $smallPic = $("#warp .tab ul li img");
+				//大图
+				var $bigPic = $("#warp .pic .pic-cover img");
+				var $picCover = $("#warp .pic .pic-cover");
+				//遮罩层
+				var $cover = $("#warp .pic .pic-cover .cover");
+				//细节显示图
+				var $show = $("#warp .pic .pic-cover .show");
+				var index = 0;//索引
+				var imgArr = [];//用来存放图片宽高比属性
+				//初始化
+				init();
+				//小图移入事件
+				$tabLi.mouseover(function(){
+					index = $(this).index();
+					$(this).addClass("on").siblings().removeClass("on");
+					var src = $(this).find("img").attr("src");
+					//设置大图宽高
+					$bigPic.attr({
+						src:src,
+						width:imgArr[index].width * 400,
+						height:imgArr[index].height * 400
+					});
+					//设置放置图片的偏移量
+					$picCover.css({
+						left:(400 - imgArr[index].width*400)/2,
+						top:(400 - imgArr[index].height*400)/2
+					});
+					
+					$show.css("background-image","url("+src+")")
+				});
+				//初始化小图片位置大小
+				function init(){
+					$smallPic.each(function(i){
+						var imgWidth = $(this).width();
+						var imgHeight = $(this).height();
+						//图片宽高比
+						var scale = (imgWidth/imgHeight) <=1 ? (imgWidth/imgHeight):(imgHeight/imgWidth);
+						//console.log(scale)
+						//设置图片大小和居中
+						if(imgWidth>=imgHeight){
+							$(this).css({
+								width:$tabLi.width(),
+								height:$tabLi.height()*scale,
+								display:"block",
+								top:($tabLi.height() - $tabLi.height()*scale)/2
+							});
+							//用来存放图片宽高比属性
+							imgArr[i] = {width:1,height:1*scale,realWidth:imgWidth,realHeight:imgHeight};
+						}else{
+							$(this).css({
+								width:$tabLi.width()*scale,
+								height:$tabLi.height(),
+								display:"block",
+								left:($tabLi.width() - $tabLi.width()*scale)/2 
+							});
+							//用来存放图片宽高比属性
+							imgArr[i] = {width:1*scale,height:1,realWidth:imgWidth,realHeight:imgHeight};
+						};
+					});
+				}
+				//鼠标移入pic-cover中
+				$picCover.mousemove(function(e){
+					var e = e || event;
+					$cover.show();
+					$show.show();
+					//获取鼠标x y坐标
+					var x = e.pageX ;
+					var y = e.pageY ;
+					//设置cover层偏移量
+					var xx = x - $picCover.offset().left - $cover.width()/2;
+					var yy = y - $picCover.offset().top - $cover.height()/2;
+					var maxX = $picCover.width() - $cover.width();
+					var maxY = $picCover.height() - $cover.height();
+					if(xx <= 0) xx = 0;
+					if(yy <= 0) yy = 0;
+					if(xx >= maxX) xx = maxX;
+					if(yy >= maxY) yy = maxY;					
+					//cover位置
+					$cover.css({
+						left:xx,
+						top:yy
+					});
+					//细节图片显示
+					//更改cover的大小 $show.width()/imgArr[index].realWidth = cover的宽/$picCover.width() 当前cover的高宽/当前图片大小 = 显示图片大小 / 真实图片大小
+					var a = $show.width()*$picCover.width()/imgArr[index].realWidth;
+					var b = $show.height()*$picCover.height()/imgArr[index].realHeight;
+					$cover.css({
+						width:a,
+						height:b
+					});
+					//show跟随鼠标移动bit 比例系数; 当前偏移量/当前图片大小  = 细节图位移/真实图片大小------------>求细节图位移
+					var bitX = xx/$picCover.width();
+					var bitY = yy/$picCover.height();
+					var realImgWidth = imgArr[index].realWidth;
+					var realImgHeight = imgArr[index].realHeight;
+					//console.log(realImgWidth+" "+realImgHeight)
+					//console.log(bitX+" "+bitY)
+					$show.css({
+						"background-position":(-bitX*realImgWidth)+"px "+(-bitY*realImgHeight)+"px"
+					});
+				}).mouseout(function(){
+					$cover.hide();
+					$show.hide();
+				});
+				//鼠标移入到show的时候 ------防止移动过快bug 导致不隐藏 和移动默认事件
+				$show.mouseover(function(){
+					//遮盖层隐藏
+					$cover.hide();
+					$show.hide();
+				}).mousemove(function(){
+					return false;
+				});
+			});
+		</script>
+	</body>
+</html>
