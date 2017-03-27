@@ -88,19 +88,19 @@
 						//设置图片大小和居中
 						if(imgWidth>=imgHeight){
 							$(this).css({
-								width:50,
-								height:50*scale,
+								width:$tabLi.width(),
+								height:$tabLi.height()*scale,
 								display:"block",
-								top:(50 - 50*scale)/2
+								top:($tabLi.height() - $tabLi.height()*scale)/2
 							});
 							//用来存放图片宽高比属性
 							imgArr[i] = {width:1,height:1*scale,realWidth:imgWidth,realHeight:imgHeight};
 						}else{
 							$(this).css({
-								width:50*scale,
-								height:50,
+								width:$tabLi.width()*scale,
+								height:$tabLi.height(),
 								display:"block",
-								left:(50 - 50*scale)/2 
+								left:($tabLi.width() - $tabLi.width()*scale)/2 
 							});
 							//用来存放图片宽高比属性
 							imgArr[i] = {width:1*scale,height:1,realWidth:imgWidth,realHeight:imgHeight};
